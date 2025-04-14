@@ -28,30 +28,5 @@ This is used in [Archipelago cross-game multiworld randomizer](https://github.co
 ## API
 
 ```python
-main(src: Path, dst: Path, placement: Path, apseed: str, apslot: str, seed: int, flags: str,
-     money: int, exp: int, switches: list[str])  # create a randomized rom
-get_locations() -> List[Location]  # returns a list of all non-sniff locations
-get_sniff_locations() -> List[Location]  # returns a lof of all sniff spots
-get_items() -> List[Item]  # returns a lost of all vanilla non-sniff items
-get_sniff_items() -> List[Item]  # returns a list of vanilla sniff spot items
-get_extra_items() -> List[Item]  # returns all extra items that can be placed, but are not vanilla
-get_traps() -> List[Item]  # returns all traps that can be placed
-get_logic() -> List[Location]  # returns the logic as real and pseudo locations for all locations that provide progress
-P_...  # some progression IDs
-
-class Location:
-    name: str
-    type: int  # location type, i.e. gourd, alchemy, boss
-    index: int  # location index for each location type. (type, index) gives a unique ID
-    difficulty: int  # difficulty 0..2 for bad/hidden spots
-    requires: List[Tuple[int, int]]  # list of (amount, progression) required to reach the spot
-    provides: List[Tuple[int, int]]  # list of (amount, progression) provided by reaching the spot
-
-class Item:
-    name: str
-    progression: bool
-    useful: bool
-    type: int  # vanilla location type or extra location type, i.e. gourd, alchemy, boss, trap
-    index: int  # item index for each location type. (type, index) gives a unique ID
-    provides: List[Tuple[int, int]]  # list of (amount, progression) provided by obtaining the item
+main(input: Path, output: Path)  # transforms a resource into another
 ```

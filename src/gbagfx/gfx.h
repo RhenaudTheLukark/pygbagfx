@@ -22,7 +22,7 @@ struct NonAffineTile {
     unsigned short hflip:1;
     unsigned short vflip:1;
     unsigned short palno:4;
-} __attribute__((packed));
+};
 
 struct Tilemap {
     union {

@@ -1,33 +1,31 @@
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 import pathlib
-import subprocess
-import shutil
 import platform
 
 root_dir = pathlib.Path(__file__).parent.absolute().relative_to(pathlib.Path.cwd().absolute())
 src_dir = root_dir / 'src'
 gbagfx_dir = src_dir / 'gbagfx'
 
-sources = [src_dir / '_gbagfx.c']
 includes = list(gbagfx_dir.glob('*.h')) + [gbagfx_dir / 'main.c']
+sources = [src_dir / '_gbagfx.c'] + [f for f in list(gbagfx_dir.glob('*.c')) if f not in includes]
 
 long_description = (root_dir / 'README.md').read_text(encoding='utf-8')
 debug_c_args = {
-    'unix': ['-Og', '-g'],
-    'gcc': ['-Og', '-g'],
+    'unix': ['-Og', '-g', '-lpng', '-lzlib'],
+    'gcc': ['-Og', '-g', '-lpng', '-lzlib'],
 }
 release_c_args = {
-    'unix': ['-Os', '-s', '-ffunction-sections'],
-    'gcc': ['-Os', '-s', '-ffunction-sections'],
+    'unix': ['-Os', '-s', '-lpng', '-lzlib', '-ffunction-sections'],
+    'gcc': ['-Os', '-s', '-lpng', '-lzlib', '-ffunction-sections'],
     'msvc': ['/Os'],
-    'mingw32': ['-Os', '-s'],
+    'mingw32': ['-Os', '-s', '-lpng', '-lzlib'],
 }
 debug_l_args = {
 }
 release_l_args = {
     'unix': ['-s', '-Wl,--gc-sections'],
-    'gcc': ['-s', '-Wl,--gc-sections']
+    'gcc': ['-s', '-Wl,--gc-sections'],
 }
 c_args = release_c_args
 l_args = release_l_args
@@ -43,11 +41,7 @@ gbagfx_module = Extension(
     depends=list(map(str, includes)),
     define_macros=[('NO_ASSERT', 1), ('NDEBUG', 1)])
 
-class EvermizerExtBuilder(EvermizerPreBuild, build_ext):
-    def run(self):
-        self.prebuild()
-        return build_ext.run(self)
-
+class GbagfxExtBuilder(build_ext):
     def build_extensions(self):
         c = self.compiler.compiler_type
         if c not in c_args and c not in l_args:
@@ -60,17 +54,15 @@ class EvermizerExtBuilder(EvermizerPreBuild, build_ext):
                 e.extra_link_args = l_args[c]
         return build_ext.build_extensions(self)
 
-
 setup(
     name='pygbagfx',
     author='RhenaudTheLukark',
-    version='0.1',
+    version='0.0.10',
     description='Python wrapper for gbagfx',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    license='LGPLv3',
     url='https://github.com/RhenaudTheLukark/pygbagfx',
     python_requires='>=3',
     ext_modules=[gbagfx_module],
-    cmdclass={'build_ext': EvermizerExtBuilder}
+    cmdclass={'build_ext': GbagfxExtBuilder},
 )
